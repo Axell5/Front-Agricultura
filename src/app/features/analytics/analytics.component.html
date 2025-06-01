@@ -1,0 +1,49 @@
+<div class="analytics-container">
+  <h1 class="analytics-title">Farm Analytics</h1>
+  
+  <div class="analytics-grid">
+    <div class="analytics-card">
+      <h3>Crop Yield</h3>
+      <div class="metric">
+        <span class="value">{{ analytics.cropYield.current }}%</span>
+        <span class="trend" [class.up]="analytics.cropYield.trend === 'up'" [class.down]="analytics.cropYield.trend === 'down'">
+          {{ analytics.cropYield.trend === 'up' ? '↑' : '↓' }}
+          {{ analytics.cropYield.current - analytics.cropYield.previous }}%
+        </span>
+      </div>
+    </div>
+    
+    <div class="analytics-card">
+      <h3>Water Usage Efficiency</h3>
+      <div class="metric">
+        <span class="value">{{ analytics.waterUsage.current }}%</span>
+        <span class="trend" [class.up]="analytics.waterUsage.trend === 'up'" [class.down]="analytics.waterUsage.trend === 'down'">
+          {{ analytics.waterUsage.trend === 'up' ? '↑' : '↓' }}
+          {{ analytics.waterUsage.current - analytics.waterUsage.previous }}%
+        </span>
+      </div>
+    </div>
+    
+    <div class="analytics-card">
+      <h3>Soil Health Index</h3>
+      <div class="metric">
+        <span class="value">{{ analytics.soilHealth.current }}%</span>
+        <span class="trend" [class.up]="analytics.soilHealth.trend === 'up'" [class.down]="analytics.soilHealth.trend === 'down'">
+          {{ analytics.soilHealth.trend === 'up' ? '↑' : '↓' }}
+          {{ analytics.soilHealth.current - analytics.soilHealth.previous }}%
+        </span>
+      </div>
+    </div>
+    
+    <div class="analytics-card">
+      <h3>Pest Control Effectiveness</h3>
+      <div class="metric">
+        <span class="value">{{ analytics.pestControl.current }}%</span>
+        <span class="trend" [class.up]="analytics.pestControl.trend === 'up'" [class.down]="analytics.pestControl.trend === 'down'">
+          {{ analytics.pestControl.trend === 'up' ? '↑' : '↓' }}
+          {{ analytics.pestControl.current - analytics.pestControl.previous }}%
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

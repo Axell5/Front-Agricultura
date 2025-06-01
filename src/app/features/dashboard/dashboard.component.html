@@ -1,0 +1,92 @@
+<div class="dashboard-container">
+  <h1 class="dashboard-title">Dashboard</h1>
+  
+  <div class="dashboard-stats">
+    <app-card class="stat-card" title="Field Health" subtitle="Overall Status" type="primary">
+      <div class="health-indicator">
+        <div class="health-meter">
+          <div class="health-value" style="width: 85%"></div>
+        </div>
+        <div class="health-text">85% Healthy</div>
+      </div>
+    </app-card>
+    
+    <app-card class="stat-card" title="Crops" subtitle="Current Status">
+      <div class="crop-status">
+        <div class="crop-item">
+          <span class="crop-name">Corn</span>
+          <span class="crop-progress">Growing (65%)</span>
+        </div>
+        <div class="crop-item">
+          <span class="crop-name">Wheat</span>
+          <span class="crop-progress">Harvesting (90%)</span>
+        </div>
+        <div class="crop-item">
+          <span class="crop-name">Soybeans</span>
+          <span class="crop-progress">Planting (15%)</span>
+        </div>
+      </div>
+    </app-card>
+    
+    <app-card class="stat-card" title="Weather" subtitle="Current Conditions">
+      <div class="weather-info">
+        <div class="weather-main">
+          <div class="weather-icon">🌤️</div>
+          <div class="weather-temp">{{ weatherData.temperature }}°C</div>
+        </div>
+        <div class="weather-details">
+          <div class="weather-detail">
+            <span class="detail-label">Humidity:</span>
+            <span class="detail-value">{{ weatherData.humidity }}%</span>
+          </div>
+          <div class="weather-detail">
+            <span class="detail-label">Rainfall:</span>
+            <span class="detail-value">{{ weatherData.rainfall }}mm</span>
+          </div>
+          <div class="weather-detail">
+            <span class="detail-label">Forecast:</span>
+            <span class="detail-value">{{ weatherData.forecast }}</span>
+          </div>
+        </div>
+      </div>
+    </app-card>
+  </div>
+  
+  <div class="dashboard-sections">
+    <div class="dashboard-section">
+      <h2 class="section-title">Sensor Alerts</h2>
+      <div class="alerts-list">
+        <div *ngFor="let alert of sensorAlerts" class="alert-item" [ngClass]="{'alert-critical': alert.status === 'Critical', 'alert-warning': alert.status === 'Low' || alert.status === 'High', 'alert-success': alert.status === 'Optimal'}">
+          <div class="alert-icon">
+            <span *ngIf="alert.status === 'Critical'">⚠️</span>
+            <span *ngIf="alert.status === 'Low' || alert.status === 'High'">⚠️</span>
+            <span *ngIf="alert.status === 'Optimal'">✅</span>
+          </div>
+          <div class="alert-details">
+            <div class="alert-title">{{ alert.type }} - {{ alert.status }}</div>
+            <div class="alert-location">{{ alert.location }}</div>
+          </div>
+          <div class="alert-time">{{ alert.time }}</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="dashboard-section">
+      <h2 class="section-title">Recent Activity</h2>
+      <div class="activity-list">
+        <div *ngFor="let activity of recentActivities" class="activity-item">
+          <div class="activity-icon" [ngClass]="{'activity-purchase': activity.action === 'Purchase', 'activity-message': activity.action === 'Message', 'activity-system': activity.action === 'System'}">
+            <span *ngIf="activity.action === 'Purchase'">🛒</span>
+            <span *ngIf="activity.action === 'Message'">💬</span>
+            <span *ngIf="activity.action === 'System'">🔄</span>
+          </div>
+          <div class="activity-details">
+            <div class="activity-title">{{ activity.action }}</div>
+            <div class="activity-description">{{ activity.details }}</div>
+          </div>
+          <div class="activity-time">{{ activity.time }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

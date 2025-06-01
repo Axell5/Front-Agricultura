@@ -1,0 +1,10 @@
+<div class="app-container">
+  <app-header *ngIf="true"></app-header>
+  <div class="main-content">
+    <app-sidebar *ngIf="true"></app-sidebar>
+    <div class="content-area">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+  <app-footer *ngIf="true"></app-footer>
+</div>

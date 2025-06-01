@@ -1,0 +1,33 @@
+<header class="header">
+  <div class="header-container">
+    <div class="header-left">
+      <button class="menu-toggle" (click)="toggleMenu()">
+        <span class="menu-icon"></span>
+      </button>
+      <a routerLink="/" class="logo">
+        <span class="logo-text">AgriPrecision</span>
+      </a>
+    </div>
+    
+    <div class="header-right">
+      <div class="notifications">
+        <button class="notification-btn">
+          <span class="notification-icon">🔔</span>
+          <span class="notification-badge">3</span>
+        </button>
+      </div>
+      
+      <div class="user-menu" *ngIf="authService.currentUserValue">
+        <div class="user-info">
+          <span class="user-name">{{ authService.currentUserValue.name }}</span>
+          <span class="user-role">{{ authService.currentUserValue.role }}</span>
+        </div>
+        <div class="user-actions">
+          <button class="logout-btn" (click)="logout()">Logout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<app-notification></app-notification>

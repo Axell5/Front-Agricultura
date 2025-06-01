@@ -1,0 +1,34 @@
+<div class="sensor-card" [ngClass]="getStatusClass()">
+  <div class="sensor-header">
+    <div class="sensor-icon">{{ getSensorIcon() }}</div>
+    <div class="sensor-title">
+      <h3>{{ sensor.name }}</h3>
+      <p class="sensor-location">{{ sensor.location }}</p>
+    </div>
+    <div class="sensor-status">
+      <span class="status-indicator"></span>
+      <span class="status-text">{{ getStatusText() }}</span>
+    </div>
+  </div>
+  
+  <div class="sensor-reading">
+    <span class="reading-value">{{ sensor.value }}</span>
+    <span class="reading-unit">{{ sensor.unit }}</span>
+  </div>
+  
+  <div class="sensor-history">
+    <div class="history-chart">
+      <!-- Simple line visualization of history data -->
+      <div class="chart-line">
+        <div *ngFor="let point of sensor.history.slice(0, 12)" 
+             class="chart-point" 
+             [style.height.%]="point.value/sensor.history[0].value*100"></div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="sensor-footer">
+    <span class="last-updated">Updated: {{ getTimeAgo(sensor.lastUpdated) }}</span>
+    <button class="details-button">Details</button>
+  </div>
+</div>

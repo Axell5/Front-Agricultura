@@ -1,0 +1,9 @@
+<div class="card" [ngClass]="'card-' + type">
+  <div class="card-header" *ngIf="title">
+    <h3>{{ title }}</h3>
+    <p *ngIf="subtitle" class="subtitle">{{ subtitle }}</p>
+  </div>
+  <div class="card-body">
+    <ng-content></ng-content>
+  </div>
+</div>

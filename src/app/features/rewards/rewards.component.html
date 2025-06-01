@@ -1,0 +1,17 @@
+<div class="rewards-container">
+  <h1 class="rewards-title">Your Rewards</h1>
+  
+  <div class="rewards-grid">
+    <div *ngFor="let reward of rewards" class="reward-card">
+      <div class="reward-icon">{{ reward.icon }}</div>
+      <h3 class="reward-title">{{ reward.title }}</h3>
+      <p class="reward-description">{{ reward.description }}</p>
+      <div class="progress-bar">
+        <div class="progress-value" [style.width.%]="(reward.progress / reward.target) * 100"></div>
+      </div>
+      <div class="progress-text">
+        {{ reward.progress }} / {{ reward.target }} points
+      </div>
+    </div>
+  </div>
+</div>

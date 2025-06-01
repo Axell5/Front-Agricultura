@@ -1,0 +1,35 @@
+<div class="iot-dashboard">
+  <h1 class="dashboard-title">IoT Sensor Dashboard</h1>
+  
+  <div class="sensor-grid">
+    <app-sensor-card 
+      *ngFor="let sensor of sensors" 
+      [sensor]="sensor">
+    </app-sensor-card>
+  </div>
+  
+  <div class="sensor-map">
+    <h2 class="section-title">Sensor Map</h2>
+    <div class="map-container">
+      <div class="map-placeholder">
+        <p>Interactive Sensor Map</p>
+        <p class="map-note">Displays the geographical location of all sensors</p>
+      </div>
+    </div>
+  </div>
+  
+  <div class="iot-actions">
+    <app-button 
+      text="Recalibrate All Sensors" 
+      type="primary">
+    </app-button>
+    <app-button 
+      text="Download Sensor Data" 
+      type="secondary">
+    </app-button>
+    <app-button 
+      text="Reset Alerts" 
+      type="warning">
+    </app-button>
+  </div>
+</div>

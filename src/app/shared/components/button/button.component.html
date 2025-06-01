@@ -1,0 +1,8 @@
+<button 
+  [class]="'btn btn-' + type" 
+  [class.btn-block]="fullWidth" 
+  [disabled]="disabled || loading" 
+  (click)="onClick()">
+  <span *ngIf="loading" class="spinner"></span>
+  {{ text }}
+</button>
