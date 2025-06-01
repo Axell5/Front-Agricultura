@@ -14,7 +14,7 @@ import { NotificationComponent } from '../../shared/components/notification/noti
 export class HeaderComponent {
   isMenuOpen = false;
 
-  constructor(public authService: AuthService) {}
+  constructor(public authService: AuthService) { }
 
   toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;

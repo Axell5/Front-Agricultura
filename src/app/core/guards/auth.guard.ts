@@ -1,25 +1,75 @@
 import { Injectable } from '@angular/core';
-import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { KeycloakAuthGuard, KeycloakService } from 'keycloak-angular';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AuthGuard implements CanActivate {
+export class AuthGuard extends KeycloakAuthGuard implements CanActivate {
+
   constructor(
-    private router: Router,
-    private authService: AuthService
-  ) {}
+    protected override router: Router,
+    protected keycloak: KeycloakService
+  ) {
+    super(router, keycloak);
+  }
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-    const isAuthenticated = this.authService.isAuthenticated();
-    
-    if (isAuthenticated) {
+  async isAccessAllowed(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Promise<boolean | UrlTree> {
+
+    try {
+      // Verificar si el usuario está autenticado
+      const isAuth = await this.keycloak.isLoggedIn();
+
+      if (!isAuth) {
+        console.log('Usuario no autenticado, redirigiendo a login...');
+        await this.keycloak.login({
+          redirectUri: window.location.origin + state.url,
+          prompt: 'login'
+        });
+        return false;
+      }
+
+      // Verificar si tenemos un token válido
+      const token = await this.keycloak.getToken();
+      if (!token) {
+        console.log('Token no encontrado, redirigiendo a login...');
+        await this.keycloak.login({
+          redirectUri: window.location.origin + state.url,
+          prompt: 'login'
+        });
+        return false;
+      }
+
+      // Verificar roles si están definidos en la ruta
+      const requiredRoles = route.data?.['roles'] as string[];
+      if (requiredRoles && requiredRoles.length > 0) {
+        const hasRequiredRole = requiredRoles.some(role =>
+          this.keycloak.isUserInRole(role)
+        );
+
+        if (!hasRequiredRole) {
+          console.warn('Usuario no tiene los roles requeridos:', requiredRoles);
+          return this.router.parseUrl('/dashboard');
+        }
+      }
+
       return true;
+    } catch (error) {
+      console.error('Error en AuthGuard:', error);
+      return false;
     }
+  }
 
-    // Not logged in so redirect to login page with return url
-    this.router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
-    return false;
+  // Método auxiliar para verificar roles específicos
+  private hasAnyRole(roles: string[]): boolean {
+    return roles.some(role => this.keycloak.isUserInRole(role));
+  }
+
+  // Método auxiliar para verificar todos los roles
+  private hasAllRoles(roles: string[]): boolean {
+    return roles.every(role => this.keycloak.isUserInRole(role));
   }
 }

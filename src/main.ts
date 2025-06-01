@@ -3,12 +3,29 @@ import { AppComponent } from './app/app.component';
 import { provideHttpClient, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { importProvidersFrom } from '@angular/core';
+import { importProvidersFrom, APP_INITIALIZER } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { routes } from './app/app-routing.module';
-import { AuthInterceptor } from './app/core/interceptors/auth.interceptor';
-import { ErrorInterceptor } from './app/core/interceptors/error.interceptor';
-import { AuthGuard } from './app/core/guards/auth.guard';
+import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
+
+function initializeKeycloak(keycloak: KeycloakService) {
+  return () =>
+    keycloak.init({
+      config: {
+        url: 'http://localhost:8085',
+        realm: 'mi-realm',
+        clientId: 'mi-api'
+      },
+      initOptions: {
+        onLoad: 'check-sso',
+        silentCheckSsoRedirectUri: window.location.origin + '/assets/silent-check-sso.html',
+        checkLoginIframe: false, // Cambiado a false para evitar problemas
+        pkceMethod: 'S256',
+        enableLogging: true // Habilitamos logging para debug
+      },
+      bearerExcludedUrls: ['/assets']
+    });
+}
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -17,10 +34,15 @@ bootstrapApplication(AppComponent, {
     provideAnimations(),
     importProvidersFrom(
       FormsModule,
-      ReactiveFormsModule
+      ReactiveFormsModule,
+      KeycloakAngularModule
     ),
-    AuthGuard,
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
+    KeycloakService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeKeycloak,
+      multi: true,
+      deps: [KeycloakService]
+    }
   ]
 }).catch(err => console.error(err));
