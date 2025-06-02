@@ -1,7 +1,7 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://api.example.com',
-  wsUrl: 'wss://api.example.com/ws',
+  apiUrl: 'http://localhost:3000',
+  wsUrl: 'ws://localhost:3000/ws',
   payuPublicKey: 'YOUR_PAYU_PUBLIC_KEY',
   payuMerchantId: '508029',
   payuAccountId: '512321',
