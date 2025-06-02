@@ -12,15 +12,7 @@ export class PaymentService {
   constructor(private http: HttpClient) {}
 
   initPayment(payment: any): Observable<any> {
-    const signature = this.generateSignature(payment.amount);
-    const paymentData = {
-      ...payment,
-      signature,
-      apiKey: environment.payuApiKey,
-      merchantId: environment.payuMerchantId
-    };
-
-    return this.http.post(`${this.apiUrl}`, paymentData).pipe(
+    return this.http.post(`${this.apiUrl}`, payment).pipe(
       catchError(error => {
         console.error('Payment initialization error:', error);
         return throwError(() => new Error('Error al iniciar el pago'));
@@ -35,22 +27,5 @@ export class PaymentService {
         return throwError(() => new Error('Error al procesar el pago'));
       })
     );
-  }
-
-  private generateSignature(amount: number): string {
-    const apiKey = environment.payuApiKey;
-    const merchantId = environment.payuMerchantId;
-    const referenceCode = `ORDER-${Date.now()}`;
-    const currency = 'USD';
-
-    // PayU signature generation (MD5)
-    const signatureString = `${apiKey}~${merchantId}~${referenceCode}~${amount}~${currency}`;
-    return this.md5(signatureString);
-  }
-
-  private md5(str: string): string {
-    // Simple MD5 implementation for demo purposes
-    // In production, use a proper crypto library
-    return btoa(str).slice(0, 32);
   }
 }
