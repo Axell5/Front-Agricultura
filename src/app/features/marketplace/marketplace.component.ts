@@ -92,7 +92,7 @@ export class MarketplaceComponent implements OnInit {
 
     this.paymentService.initPayment(payment).subscribe({
       next: (response) => {
-        this.openPayUCheckout(response);
+        this.initPayUCheckout(response);
       },
       error: (error) => {
         this.notificationService.showError('Error al iniciar el pago');
@@ -100,32 +100,41 @@ export class MarketplaceComponent implements OnInit {
     });
   }
 
-  private openPayUCheckout(paymentData: any): void {
-    const handler = window.payU.checkout.configure({
-      publicKey: environment.payuPublicKey,
+  private initPayUCheckout(paymentData: any): void {
+    const paymentForm = document.createElement('form');
+    paymentForm.method = 'post';
+    paymentForm.action = 'https://sandbox.checkout.payulatam.com/ppp-web-gateway-payu/';
+
+    const params = {
       merchantId: environment.payuMerchantId,
       accountId: environment.payuAccountId,
-      currency: 'USD',
-      amount: this.getTotal(),
       description: 'Compra en AgriPrecision',
       referenceCode: paymentData.id,
+      amount: this.getTotal().toString(),
+      tax: '0',
+      taxReturnBase: '0',
+      currency: 'USD',
       signature: paymentData.signature,
-      test: environment.production ? 0 : 1,
-      onSuccess: (response: any) => {
-        this.processPayment(paymentData.id, response);
-      },
-      onError: (error: any) => {
-        this.notificationService.showError('Error en el pago');
-      },
-      onClose: () => {
-        this.notificationService.showInfo('Pago cancelado');
-      }
+      test: environment.production ? '0' : '1',
+      buyerEmail: 'buyer@email.com',
+      responseUrl: `${window.location.origin}/payment/response`,
+      confirmationUrl: `${environment.apiUrl}/payments/confirmation`
+    };
+
+    Object.entries(params).forEach(([key, value]) => {
+      const input = document.createElement('input');
+      input.name = key;
+      input.type = 'hidden';
+      input.value = value;
+      paymentForm.appendChild(input);
     });
 
-    handler.open();
+    document.body.appendChild(paymentForm);
+    paymentForm.submit();
+    document.body.removeChild(paymentForm);
   }
 
-  private processPayment(paymentId: string, payuResponse: any): void {
+  private processPayment(paymentId: string): void {
     this.paymentService.processPayment(paymentId).subscribe({
       next: () => {
         this.notificationService.showSuccess('Pago procesado exitosamente');
