@@ -49,6 +49,7 @@ export class PaymentsService {
       payment.status = PaymentStatus.PROCESSING;
       await this.paymentsRepository.save(payment);
 
+      const metadata = payment.metadata || {};
       const payuPayload = {
         language: 'es',
         command: 'SUBMIT_TRANSACTION',
@@ -72,10 +73,10 @@ export class PaymentsService {
             },
             buyer: {
               merchantBuyerId: 'buyer_123',
-              fullName: payment.metadata?.buyerName || 'John Doe',
-              emailAddress: payment.metadata?.buyerEmail || 'buyer@example.com',
-              contactPhone: payment.metadata?.buyerPhone || '7563126',
-              dniNumber: payment.metadata?.buyerDni || '123456789'
+              fullName: metadata['buyerName'] || 'John Doe',
+              emailAddress: metadata['buyerEmail'] || 'buyer@example.com',
+              contactPhone: metadata['buyerPhone'] || '7563126',
+              dniNumber: metadata['buyerDni'] || '123456789'
             }
           },
           creditCard: {
@@ -114,7 +115,7 @@ export class PaymentsService {
       }
 
       return await this.paymentsRepository.save(payment);
-    } catch (error) {
+    } catch (error: any) {
       payment.status = PaymentStatus.FAILED;
       await this.paymentsRepository.save(payment);
       

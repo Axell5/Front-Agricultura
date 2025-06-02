@@ -13,34 +13,34 @@ export enum OrderStatus {
 @Entity('orders')
 export class Order {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column()
-  userId: string;
+  userId!: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
-  total: number;
+  total!: number;
 
   @Column({
     type: 'enum',
     enum: OrderStatus,
     default: OrderStatus.PENDING
   })
-  status: OrderStatus;
+  status!: OrderStatus;
 
   @Column({ type: 'jsonb' })
-  items: Array<{
+  items!: Array<{
     productId: string;
     quantity: number;
     price: number;
   }>;
 
   @OneToMany(() => Payment, payment => payment.order)
-  payments: Payment[];
+  payments!: Payment[];
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 }

@@ -12,36 +12,36 @@ export enum PaymentStatus {
 @Entity('payments')
 export class Payment {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
-  amount: number;
+  amount!: number;
 
   @Column()
-  currency: string;
+  currency!: string;
 
   @Column({
     type: 'enum',
     enum: PaymentStatus,
     default: PaymentStatus.PENDING
   })
-  status: PaymentStatus;
+  status!: PaymentStatus;
 
   @Column()
-  paymentMethod: string;
+  paymentMethod!: string;
 
   @Column({ nullable: true })
-  transactionId: string;
+  transactionId!: string;
 
   @ManyToOne(() => Order, order => order.payments)
-  order: Order;
+  order!: Order;
 
   @Column({ type: 'jsonb', nullable: true })
-  metadata: Record<string, any>;
+  metadata!: Record<string, any>;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 }

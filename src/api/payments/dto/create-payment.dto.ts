@@ -5,17 +5,17 @@ export class CreatePaymentDto {
   @ApiProperty()
   @IsNumber()
   @IsNotEmpty()
-  amount: number;
+  amount!: number;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  currency: string;
+  currency!: string;
 
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  paymentMethod: string;
+  paymentMethod!: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
