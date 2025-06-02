@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, HttpException, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { PaymentsService } from './payments.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
@@ -6,14 +6,23 @@ import { UpdatePaymentDto } from './dto/update-payment.dto';
 
 @ApiTags('payments')
 @Controller('payments')
-@ApiBearerAuth()
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
   @Post()
   @ApiOperation({ summary: 'Create payment' })
-  create(@Body() createPaymentDto: CreatePaymentDto) {
-    return this.paymentsService.create(createPaymentDto);
+  async create(@Body() createPaymentDto: CreatePaymentDto) {
+    try {
+      const payment = await this.paymentsService.create(createPaymentDto);
+      return {
+        id: payment.id,
+        amount: payment.amount,
+        currency: payment.currency,
+        status: payment.status
+      };
+    } catch (error) {
+      throw new HttpException('Error creating payment', HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Get()
