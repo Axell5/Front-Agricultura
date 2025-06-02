@@ -5,4 +5,5 @@ export const environment = {
   payuPublicKey: '4Vj8eK4rloUd272L48hsrarnUAK',
   payuMerchantId: '508029',
   payuAccountId: '512321',
+  payuApiKey: '4Vj8eK4rloUd272L48hsrarnUAK'
 };
