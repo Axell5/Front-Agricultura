@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CardComponent } from '../../shared/components/card/card.component';
 import { ButtonComponent } from '../../shared/components/button/button.component';
+import { PaymentService } from '../../core/services/payment.service';
+import { NotificationService } from '../../core/services/notification.service';
 
 interface Product {
   id: string;
@@ -49,6 +51,11 @@ export class MarketplaceComponent implements OnInit {
 
   cart: { product: Product; quantity: number }[] = [];
 
+  constructor(
+    private paymentService: PaymentService,
+    private notificationService: NotificationService
+  ) {}
+
   ngOnInit(): void {}
 
   addToCart(product: Product): void {
@@ -69,7 +76,63 @@ export class MarketplaceComponent implements OnInit {
   }
 
   checkout(): void {
-    // Implementar integración con PayU
-    console.log('Procesando pago:', this.cart);
+    const payment = {
+      amount: this.getTotal(),
+      currency: 'USD',
+      paymentMethod: 'CARD',
+      metadata: {
+        items: this.cart.map(item => ({
+          productId: item.product.id,
+          quantity: item.quantity,
+          price: item.product.price
+        }))
+      }
+    };
+
+    this.paymentService.initPayment(payment).subscribe({
+      next: (response) => {
+        this.openPayUCheckout(response);
+      },
+      error: (error) => {
+        this.notificationService.showError('Error al iniciar el pago');
+      }
+    });
+  }
+
+  private openPayUCheckout(paymentData: any): void {
+    const handler = window.payU.checkout.configure({
+      publicKey: environment.payuPublicKey,
+      merchantId: environment.payuMerchantId,
+      accountId: environment.payuAccountId,
+      currency: 'USD',
+      amount: this.getTotal(),
+      description: 'Compra en AgriPrecision',
+      referenceCode: paymentData.id,
+      signature: paymentData.signature,
+      test: environment.production ? 0 : 1,
+      onSuccess: (response: any) => {
+        this.processPayment(paymentData.id, response);
+      },
+      onError: (error: any) => {
+        this.notificationService.showError('Error en el pago');
+      },
+      onClose: () => {
+        this.notificationService.showInfo('Pago cancelado');
+      }
+    });
+
+    handler.open();
+  }
+
+  private processPayment(paymentId: string, payuResponse: any): void {
+    this.paymentService.processPayment(paymentId).subscribe({
+      next: () => {
+        this.notificationService.showSuccess('Pago procesado exitosamente');
+        this.cart = [];
+      },
+      error: () => {
+        this.notificationService.showError('Error al procesar el pago');
+      }
+    });
   }
 }
