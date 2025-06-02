@@ -2,7 +2,7 @@ export const environment = {
   production: true,
   apiUrl: 'https://api.agriprecision.com',
   wsUrl: 'wss://api.agriprecision.com/ws',
-  payuPublicKey: 'YOUR_PAYU_PUBLIC_KEY',
-  payuMerchantId: 'YOUR_PAYU_MERCHANT_ID',
-  payuAccountId: 'YOUR_PAYU_ACCOUNT_ID'
+  payuPublicKey: 'TNt331BACO6x4rE8NDsitKaMYK',
+  payuMerchantId: 'JnzN3ExacO9U6P3',
+  payuAccountId: 'PK78c9750349I08X1IddX5I70b'
 };
