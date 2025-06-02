@@ -1,14 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { PaymentsService } from './payments.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
-import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('payments')
 @Controller('payments')
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
