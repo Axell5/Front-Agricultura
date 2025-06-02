@@ -1,4 +1,51 @@
 <div class="marketplace-container">
-  <h1>Marketplace</h1>
-  <p>Marketplace component is under construction.</p>
+  <div class="marketplace-header">
+    <h1 class="marketplace-title">Marketplace</h1>
+    <div class="cart-summary" *ngIf="cart.length > 0">
+      <span>🛒 {{ cart.length }} productos</span>
+      <span class="cart-total">${{ getTotal() | number:'1.2-2' }}</span>
+    </div>
+  </div>
+
+  <div class="products-grid">
+    <app-card *ngFor="let product of products" class="product-card">
+      <img [src]="product.image" [alt]="product.name" class="product-image">
+      <h3 class="product-name">{{ product.name }}</h3>
+      <p class="product-description">{{ product.description }}</p>
+      <div class="product-footer">
+        <span class="product-price">${{ product.price | number:'1.2-2' }}</span>
+        <app-button 
+          text="Agregar al carrito" 
+          type="primary"
+          (clicked)="addToCart(product)">
+        </app-button>
+      </div>
+    </app-card>
+  </div>
+
+  <div class="cart-section" *ngIf="cart.length > 0">
+    <h2>Carrito de Compras</h2>
+    <div class="cart-items">
+      <div *ngFor="let item of cart" class="cart-item">
+        <img [src]="item.product.image" [alt]="item.product.name" class="cart-item-image">
+        <div class="cart-item-details">
+          <h4>{{ item.product.name }}</h4>
+          <p>Cantidad: {{ item.quantity }}</p>
+          <p>Subtotal: ${{ item.product.price * item.quantity | number:'1.2-2' }}</p>
+        </div>
+        <button class="remove-item" (click)="removeFromCart(item.product.id)">×</button>
+      </div>
+    </div>
+    <div class="cart-footer">
+      <div class="cart-total">
+        <span>Total:</span>
+        <span>${{ getTotal() | number:'1.2-2' }}</span>
+      </div>
+      <app-button 
+        text="Proceder al pago" 
+        type="primary"
+        (clicked)="checkout()">
+      </app-button>
+    </div>
+  </div>
 </div>
