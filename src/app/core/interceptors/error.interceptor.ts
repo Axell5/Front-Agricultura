@@ -1,4 +1,4 @@
-import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
+import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -14,14 +14,25 @@ export class ErrorInterceptor implements HttpInterceptor {
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(request).pipe(
-      catchError(err => {
-        if (err.status === 401) {
+      catchError((error: HttpErrorResponse) => {
+        if (error.status === 401) {
           // Auto logout if 401 response returned from api
           this.authService.logout();
         }
         
-        const error = err.error?.message || err.statusText;
-        this.notificationService.showError(error);
+        let errorMessage: string;
+        
+        if (error.status === 0) {
+          errorMessage = 'No se pudo conectar con el servidor. Por favor, verifique su conexión a internet.';
+        } else if (error.error instanceof ErrorEvent) {
+          // Client-side error
+          errorMessage = error.error.message;
+        } else {
+          // Server-side error
+          errorMessage = error.error?.message || error.message || 'Error del servidor';
+        }
+
+        this.notificationService.showError(errorMessage);
         return throwError(() => error);
       })
     );

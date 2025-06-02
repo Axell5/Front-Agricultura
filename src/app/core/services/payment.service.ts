@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { Observable, catchError, throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -13,18 +14,18 @@ export class PaymentService {
 
   initPayment(payment: any): Observable<any> {
     return this.http.post(`${this.apiUrl}`, payment).pipe(
-      catchError(error => {
+      catchError((error: HttpErrorResponse) => {
         console.error('Payment initialization error:', error);
-        return throwError(() => new Error('Error al iniciar el pago'));
+        return throwError(() => error);
       })
     );
   }
 
   processPayment(paymentId: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/${paymentId}/process`, {}).pipe(
-      catchError(error => {
+      catchError((error: HttpErrorResponse) => {
         console.error('Payment processing error:', error);
-        return throwError(() => new Error('Error al procesar el pago'));
+        return throwError(() => error);
       })
     );
   }

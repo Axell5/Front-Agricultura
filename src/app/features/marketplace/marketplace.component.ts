@@ -101,7 +101,7 @@ export class MarketplaceComponent implements OnInit {
         },
         error: (error) => {
           console.error('Payment initialization error:', error);
-          this.notificationService.showError('Error al iniciar el pago. Por favor intente nuevamente.');
+          // Error handling is now done by the ErrorInterceptor
         }
       });
     } catch (error) {
@@ -187,7 +187,7 @@ export class MarketplaceComponent implements OnInit {
       },
       error: (error) => {
         console.error('Payment processing error:', error);
-        this.notificationService.showError('Error al procesar el pago. Por favor intente nuevamente.');
+        // Error handling is now done by the ErrorInterceptor
       }
     });
   }
