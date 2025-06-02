@@ -77,61 +77,89 @@ export class MarketplaceComponent implements OnInit {
   }
 
   checkout(): void {
-    const payment = {
-      amount: this.getTotal(),
-      currency: 'USD',
-      paymentMethod: 'CARD',
-      metadata: {
-        items: this.cart.map(item => ({
-          productId: item.product.id,
-          quantity: item.quantity,
-          price: item.product.price
-        }))
-      }
-    };
+    try {
+      const payment = {
+        amount: this.getTotal(),
+        currency: 'USD',
+        paymentMethod: 'CARD',
+        metadata: {
+          items: this.cart.map(item => ({
+            productId: item.product.id,
+            quantity: item.quantity,
+            price: item.product.price
+          }))
+        }
+      };
 
-    this.paymentService.initPayment(payment).subscribe({
-      next: (response) => {
-        this.initPayUCheckout(response);
-      },
-      error: (error) => {
-        this.notificationService.showError('Error al iniciar el pago');
-      }
-    });
+      this.paymentService.initPayment(payment).subscribe({
+        next: (response) => {
+          if (response && response.id) {
+            this.initPayUCheckout(response);
+          } else {
+            throw new Error('Invalid payment response');
+          }
+        },
+        error: (error) => {
+          console.error('Payment initialization error:', error);
+          this.notificationService.showError('Error al iniciar el pago. Por favor intente nuevamente.');
+        }
+      });
+    } catch (error) {
+      console.error('Checkout error:', error);
+      this.notificationService.showError('Error al procesar el pago. Por favor intente nuevamente.');
+    }
   }
 
   private initPayUCheckout(paymentData: any): void {
-    const paymentForm = document.createElement('form');
-    paymentForm.method = 'post';
-    paymentForm.action = 'https://sandbox.checkout.payulatam.com/ppp-web-gateway-payu/';
+    try {
+      const paymentForm = document.createElement('form');
+      paymentForm.method = 'post';
+      paymentForm.action = environment.production 
+        ? 'https://checkout.payulatam.com/ppp-web-gateway-payu/'
+        : 'https://sandbox.checkout.payulatam.com/ppp-web-gateway-payu/';
 
-    const params = {
-      merchantId: environment.payuMerchantId,
-      accountId: environment.payuAccountId,
-      description: 'Compra en AgriPrecision',
-      referenceCode: paymentData.id,
-      amount: this.getTotal().toString(),
-      tax: '0',
-      taxReturnBase: '0',
-      currency: 'USD',
-      signature: paymentData.signature,
-      test: environment.production ? '0' : '1',
-      buyerEmail: 'buyer@email.com',
-      responseUrl: `${window.location.origin}/payment/response`,
-      confirmationUrl: `${environment.apiUrl}/payments/confirmation`
-    };
+      const params = {
+        merchantId: environment.payuMerchantId,
+        accountId: environment.payuAccountId,
+        description: 'Compra en AgriPrecision',
+        referenceCode: paymentData.id,
+        amount: this.getTotal().toFixed(2),
+        tax: '0',
+        taxReturnBase: '0',
+        currency: 'USD',
+        signature: paymentData.signature,
+        test: environment.production ? '0' : '1',
+        buyerEmail: 'buyer@email.com',
+        responseUrl: `${window.location.origin}/payment/response`,
+        confirmationUrl: `${environment.apiUrl}/payments/confirmation`,
+        payerFullName: 'John Doe',
+        payerDocument: '12345678',
+        payerDocumentType: 'CC',
+        payerPhone: '1234567890',
+        payerAddress: 'Test Address',
+        payerCity: 'Test City',
+        payerState: 'Test State',
+        payerCountry: 'US',
+        payerPostalCode: '12345',
+        language: 'es',
+        displayShippingInformation: '0'
+      };
 
-    Object.entries(params).forEach(([key, value]) => {
-      const input = document.createElement('input');
-      input.name = key;
-      input.type = 'hidden';
-      input.value = value;
-      paymentForm.appendChild(input);
-    });
+      Object.entries(params).forEach(([key, value]) => {
+        const input = document.createElement('input');
+        input.name = key;
+        input.type = 'hidden';
+        input.value = value.toString();
+        paymentForm.appendChild(input);
+      });
 
-    document.body.appendChild(paymentForm);
-    paymentForm.submit();
-    document.body.removeChild(paymentForm);
+      document.body.appendChild(paymentForm);
+      paymentForm.submit();
+      document.body.removeChild(paymentForm);
+    } catch (error) {
+      console.error('PayU form initialization error:', error);
+      this.notificationService.showError('Error al iniciar el formulario de pago. Por favor intente nuevamente.');
+    }
   }
 
   private processPayment(paymentId: string): void {
@@ -140,8 +168,9 @@ export class MarketplaceComponent implements OnInit {
         this.notificationService.showSuccess('Pago procesado exitosamente');
         this.cart = [];
       },
-      error: () => {
-        this.notificationService.showError('Error al procesar el pago');
+      error: (error) => {
+        console.error('Payment processing error:', error);
+        this.notificationService.showError('Error al procesar el pago. Por favor intente nuevamente.');
       }
     });
   }
