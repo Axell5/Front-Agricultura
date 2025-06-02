@@ -1,6 +1,6 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { AppComponent } from './app/app.component';
-import { provideHttpClient, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { importProvidersFrom } from '@angular/core';
@@ -12,7 +12,7 @@ import { AuthGuard } from './app/core/guards/auth.guard';
 
 bootstrapApplication(AppComponent, {
   providers: [
-    provideHttpClient(),
+    provideHttpClient(withInterceptorsFromDi()),
     provideRouter(routes),
     provideAnimations(),
     importProvidersFrom(
@@ -20,7 +20,7 @@ bootstrapApplication(AppComponent, {
       ReactiveFormsModule
     ),
     AuthGuard,
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
+    AuthInterceptor,
+    ErrorInterceptor
   ]
 }).catch(err => console.error(err));
