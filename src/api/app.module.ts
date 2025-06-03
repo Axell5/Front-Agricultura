@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PaymentsModule } from './payments/payments.module';
 import { OrdersModule } from './orders/orders.module';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { OrdersModule } from './orders/orders.module';
       username: 'postgres',
       password: 'postgres',
       database: 'agriprecision',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      entities: [join(__dirname, '**', '*.entity{.ts,.js}')],
       synchronize: true,
     }),
     PaymentsModule,

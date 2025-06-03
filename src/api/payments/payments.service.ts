@@ -5,7 +5,7 @@ import { Payment, PaymentStatus } from './entities/payment.entity';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import axios from 'axios';
-import * as crypto from 'crypto';
+import { createHash } from 'crypto';
 
 @Injectable()
 export class PaymentsService {
@@ -39,7 +39,7 @@ export class PaymentsService {
 
   private generateSignature(referenceCode: string, amount: number, currency: string): string {
     const signatureString = `${this.payuApiKey}~${this.payuMerchantId}~${referenceCode}~${amount}~${currency}`;
-    return crypto.createHash('md5').update(signatureString).digest('hex');
+    return createHash('md5').update(signatureString).digest('hex');
   }
 
   async processPayment(id: string): Promise<Payment> {
@@ -115,14 +115,12 @@ export class PaymentsService {
       }
 
       return await this.paymentsRepository.save(payment);
-    } catch (error: any) {
+    } catch (error: unknown) {
       payment.status = PaymentStatus.FAILED;
       await this.paymentsRepository.save(payment);
       
-      throw new HttpException(
-        error.response?.data?.error || 'Payment processing failed',
-        HttpStatus.BAD_REQUEST
-      );
+      const errorMessage = error instanceof Error ? error.message : 'Payment processing failed';
+      throw new HttpException(errorMessage, HttpStatus.BAD_REQUEST);
     }
   }
 }
