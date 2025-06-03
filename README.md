@@ -6,6 +6,8 @@ Sistema web para la gestión y monitoreo de agricultura de precisión, desarroll
 
 - Node.js (versión 18 o superior)
 - NPM (incluido con Node.js)
+- Python 3.8 o superior
+- pip (gestor de paquetes de Python)
 
 ## Instalación
 
@@ -19,20 +21,41 @@ git clone <url-del-repositorio>
 cd nombre-del-proyecto
 ```
 
-3. Instalar las dependencias:
+3. Instalar las dependencias del frontend:
 ```bash
 npm install
 ```
 
+## Configuración del Backend
+
+1. Navegar al directorio del backend:
+```bash
+cd backend
+```
+
+2. Instalar las dependencias de Python:
+```bash
+pip install -r requirements.txt
+```
+
+3. Iniciar el servidor backend:
+```bash
+uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
+El servidor backend estará disponible en `http://localhost:8000`
+
 ## Ejecutar el Proyecto
 
-Para iniciar el servidor de desarrollo:
+Para iniciar el servidor de desarrollo del frontend:
 
 ```bash
 npm run dev
 ```
 
-El servidor se iniciará en `http://localhost:4200`
+El servidor frontend se iniciará en `http://localhost:4200`
+
+IMPORTANTE: Para que el sistema funcione correctamente, asegúrate de tener tanto el servidor backend como el frontend ejecutándose simultáneamente.
 
 ## Credenciales de Prueba
 
