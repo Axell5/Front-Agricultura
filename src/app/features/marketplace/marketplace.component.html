@@ -1,4 +1,67 @@
 <div class="marketplace-container">
-  <h1>Marketplace</h1>
-  <p>Marketplace component is under construction.</p>
+  <div class="marketplace-header">
+    <h1 class="marketplace-title">Marketplace</h1>
+    <app-button 
+      [text]="'View Cart (' + cartItemsCount + ')'"
+      (clicked)="toggleCart()"
+      type="primary">
+    </app-button>
+  </div>
+
+  <div class="products-grid">
+    <div *ngFor="let product of products" class="product-card">
+      <img [src]="product.image" [alt]="product.name" class="product-image">
+      <div class="product-info">
+        <h3 class="product-name">{{ product.name }}</h3>
+        <p class="product-description">{{ product.description }}</p>
+        <div class="product-price">${{ product.price.toFixed(2) }}</div>
+        <app-button 
+          text="Add to Cart"
+          (clicked)="addToCart(product)"
+          type="primary">
+        </app-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cart-preview" *ngIf="showCart">
+    <div class="cart-header">
+      <h2 class="cart-title">Shopping Cart</h2>
+      <app-button 
+        text="Close"
+        (clicked)="toggleCart()"
+        type="secondary">
+      </app-button>
+    </div>
+
+    <div class="cart-items" *ngIf="cartItems.length > 0">
+      <div *ngFor="let item of cartItems" class="cart-item">
+        <div class="cart-item-info">
+          <div class="cart-item-name">{{ item.product.name }}</div>
+          <div class="cart-item-price">${{ (item.product.price * item.quantity).toFixed(2) }}</div>
+        </div>
+        <div class="cart-item-quantity">
+          <button class="quantity-btn" (click)="decreaseQuantity(item)">-</button>
+          <span>{{ item.quantity }}</span>
+          <button class="quantity-btn" (click)="increaseQuantity(item)">+</button>
+        </div>
+      </div>
+
+      <div class="cart-total">
+        <span>Total:</span>
+        <span>${{ cartTotal.toFixed(2) }}</span>
+      </div>
+
+      <app-button 
+        text="Checkout"
+        (clicked)="checkout()"
+        type="primary"
+        [fullWidth]="true">
+      </app-button>
+    </div>
+
+    <div class="empty-cart" *ngIf="cartItems.length === 0">
+      Your cart is empty
+    </div>
+  </div>
 </div>
