@@ -14,18 +14,11 @@ export interface PaymentRequest {
   providedIn: 'root'
 })
 export class PaymentService {
-  createPayment(payment: PaymentRequest): Observable<any> {
-    // Mock successful payment response
-    const mockResponse = {
-      status: 'APPROVED',
-      transactionId: Math.random().toString(36).substring(2, 15),
-      referenceCode: payment.referenceCode,
-      amount: payment.amount,
-      currency: payment.currency,
-      timestamp: new Date().toISOString()
-    };
+  private apiUrl = 'http://localhost:8000/pago';
 
-    // Simulate network delay
-    return of(mockResponse).pipe(delay(1000));
+  constructor(private http: HttpClient) {}
+
+  createPayment(payment: PaymentRequest): Observable<any> {
+    return this.http.post<any>(this.apiUrl, payment);
   }
 }
