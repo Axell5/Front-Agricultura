@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 export interface PaymentRequest {
   referenceCode: string;
   description: string;
-  amount: number;
+  amount: float;
   currency: string;
   buyerEmail: string;
 }
