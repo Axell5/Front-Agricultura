@@ -15,7 +15,7 @@ export interface PaymentRequest {
   providedIn: 'root'
 })
 export class PaymentService {
-  private apiUrl = `${environment.apiUrl}/pago`;
+  private apiUrl = `http://localhost:8000/pago`;
 
   constructor(private http: HttpClient) {}
 
