@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environment';
+import { Observable, of } from 'rxjs';
+import { delay } from 'rxjs/operators';
 
 export interface PaymentRequest {
   referenceCode: string;
@@ -15,11 +14,18 @@ export interface PaymentRequest {
   providedIn: 'root'
 })
 export class PaymentService {
-  private apiUrl = `http://localhost:8000/pago`;
-
-  constructor(private http: HttpClient) {}
-
   createPayment(payment: PaymentRequest): Observable<any> {
-    return this.http.post(this.apiUrl, payment);
+    // Mock successful payment response
+    const mockResponse = {
+      status: 'APPROVED',
+      transactionId: Math.random().toString(36).substring(2, 15),
+      referenceCode: payment.referenceCode,
+      amount: payment.amount,
+      currency: payment.currency,
+      timestamp: new Date().toISOString()
+    };
+
+    // Simulate network delay
+    return of(mockResponse).pipe(delay(1000));
   }
 }
