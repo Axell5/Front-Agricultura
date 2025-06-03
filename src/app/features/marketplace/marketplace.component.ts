@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonComponent } from '../../shared/components/button/button.component';
 import { NotificationService } from '../../core/services/notification.service';
+import { PaymentService, PaymentRequest } from '../../core/services/payment.service';
 
 interface Product {
   id: number;
@@ -71,8 +72,13 @@ export class MarketplaceComponent {
 
   cartItems: CartItem[] = [];
   showCart = false;
+  loading = false;
 
-  constructor(private notificationService: NotificationService) {}
+  constructor(
+    private notificationService: NotificationService,
+    private paymentService: PaymentService,
+    private authService: AuthService
+  ) {}
 
   get cartItemsCount(): number {
     return this.cartItems.reduce((total, item) => total + item.quantity, 0);
@@ -111,6 +117,33 @@ export class MarketplaceComponent {
   }
 
   checkout(): void {
-    this.notificationService.showInfo('Checkout functionality coming soon!');
+    if (!this.authService.currentUserValue) {
+      this.notificationService.showError('Please login to proceed with checkout');
+      return;
+    }
+
+    this.loading = true;
+    const payment: PaymentRequest = {
+      referenceCode: `ORDER-${Date.now()}`,
+      description: `Purchase of ${this.cartItemsCount} items`,
+      amount: this.cartTotal,
+      currency: 'COP',
+      buyerEmail: this.authService.currentUserValue.email
+    };
+
+    this.paymentService.createPayment(payment).subscribe({
+      next: (response) => {
+        this.notificationService.showSuccess('Payment processed successfully');
+        this.cartItems = [];
+        this.showCart = false;
+      },
+      error: (error) => {
+        this.notificationService.showError('Payment failed. Please try again.');
+        console.error('Payment error:', error);
+      },
+      complete: () => {
+        this.loading = false;
+      }
+    });
   }
 }
