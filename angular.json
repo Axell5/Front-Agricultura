@@ -46,10 +46,7 @@
               "buildTarget": "demo:build:production"
             }
           },
-          "defaultConfiguration": "development",
-          "options": {
-            "liveReload": false
-          }
+          "defaultConfiguration": "development"
         }
       },
       "prefix": "app",
