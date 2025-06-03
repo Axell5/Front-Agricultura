@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { NotificationComponent } from '../../shared/components/notification/notification.component';
+import { KeycloakService } from 'keycloak-angular';
 
 @Component({
   selector: 'app-header',
@@ -11,16 +12,33 @@ import { NotificationComponent } from '../../shared/components/notification/noti
   standalone: true,
   imports: [CommonModule, RouterModule, NotificationComponent]
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
   isMenuOpen = false;
+  isLoggedIn = false;
+  username: string = '';
 
-  constructor(public authService: AuthService) { }
+  constructor(
+    public authService: AuthService,
+    private keycloakService: KeycloakService
+  ) { }
+
+  async ngOnInit() {
+    this.isLoggedIn = await this.keycloakService.isLoggedIn();
+    if (this.isLoggedIn) {
+      const userProfile = await this.keycloakService.loadUserProfile();
+      this.username = userProfile.username || '';
+    }
+  }
 
   toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;
   }
 
-  logout(): void {
-    this.authService.logout();
+  async logout(): Promise<void> {
+    try {
+      await this.keycloakService.logout(window.location.origin);
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
   }
 }

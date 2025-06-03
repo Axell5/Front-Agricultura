@@ -17,13 +17,12 @@
         </button>
       </div>
       
-      <div class="user-menu" *ngIf="authService.currentUserValue">
+      <div class="user-menu" *ngIf="isLoggedIn">
         <div class="user-info">
-          <span class="user-name">{{ authService.currentUserValue.name }}</span>
-          <span class="user-role">{{ authService.currentUserValue.role }}</span>
+          <span class="user-name">{{ username }}</span>
         </div>
         <div class="user-actions">
-          <button class="logout-btn" (click)="logout()">Logout</button>
+          <button class="logout-btn" (click)="logout()">Cerrar Sesión</button>
         </div>
       </div>
     </div>
