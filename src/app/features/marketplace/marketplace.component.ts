@@ -52,6 +52,30 @@ export class MarketplaceComponent implements OnInit {
       price: 199.99,
       image: 'https://images.pexels.com/photos/2132780/pexels-photo-2132780.jpeg',
       stock: 20
+    },
+    {
+      id: '4',
+      name: 'Soil pH Meter',
+      description: 'Digital pH meter for soil testing',
+      price: 49.99,
+      image: 'https://images.pexels.com/photos/4505257/pexels-photo-4505257.jpeg',
+      stock: 30
+    },
+    {
+      id: '5',
+      name: 'Organic Pesticide',
+      description: 'Natural pest control solution',
+      price: 34.99,
+      image: 'https://images.pexels.com/photos/2280549/pexels-photo-2280549.jpeg',
+      stock: 75
+    },
+    {
+      id: '6',
+      name: 'Garden Tools Set',
+      description: 'Complete set of essential garden tools',
+      price: 89.99,
+      image: 'https://images.pexels.com/photos/2736497/pexels-photo-2736497.jpeg',
+      stock: 25
     }
   ];
 
@@ -66,7 +90,10 @@ export class MarketplaceComponent implements OnInit {
     private notificationService: NotificationService
   ) {
     this.paymentForm = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.email]]
+      email: ['', [Validators.required, Validators.email]],
+      cardNumber: ['', [Validators.required, Validators.pattern('^[0-9]{16}$')]],
+      expiryDate: ['', [Validators.required, Validators.pattern('^(0[1-9]|1[0-2])/([0-9]{2})$')]],
+      cvv: ['', [Validators.required, Validators.pattern('^[0-9]{3,4}$')]]
     });
   }
 
@@ -75,20 +102,28 @@ export class MarketplaceComponent implements OnInit {
   addToCart(product: Product): void {
     const cartItem = this.cart.find(item => item.product.id === product.id);
     if (cartItem) {
-      cartItem.quantity++;
+      if (cartItem.quantity < product.stock) {
+        cartItem.quantity++;
+        this.notificationService.showSuccess('Quantity updated');
+      } else {
+        this.notificationService.showWarning('Maximum stock reached');
+      }
     } else {
       this.cart.push({ product, quantity: 1 });
+      this.notificationService.showSuccess('Item added to cart');
     }
-    this.notificationService.showSuccess('Item added to cart');
   }
 
   removeFromCart(productId: string): void {
     this.cart = this.cart.filter(item => item.product.id !== productId);
+    this.notificationService.showInfo('Item removed from cart');
   }
 
   increaseQuantity(item: CartItem): void {
     if (item.quantity < item.product.stock) {
       item.quantity++;
+    } else {
+      this.notificationService.showWarning('Maximum stock reached');
     }
   }
 
@@ -106,13 +141,14 @@ export class MarketplaceComponent implements OnInit {
 
   processPayment(): void {
     if (this.paymentForm.invalid) {
+      this.notificationService.showError('Please fill all payment details correctly');
       return;
     }
 
     this.loading = true;
     const payment = {
       referenceCode: `ORDER-${Date.now()}`,
-      description: 'Purchase from AgriPrecision Marketplace',
+      description: `Purchase from AgriPrecision - ${this.cart.length} items`,
       amount: this.getTotal(),
       currency: 'COP',
       buyerEmail: this.paymentForm.get('email')?.value
@@ -120,13 +156,11 @@ export class MarketplaceComponent implements OnInit {
 
     this.paymentService.createPayment(payment).subscribe({
       next: (response) => {
-        this.loading = false;
         if (response.code === 'SUCCESS') {
-          this.notificationService.showSuccess('Payment processed successfully');
-          this.cart = [];
-          this.showPaymentForm = false;
+          this.processPayUPayment(response.data);
         } else {
-          this.notificationService.showError('Payment failed: ' + response.error);
+          this.loading = false;
+          this.notificationService.showError('Payment initialization failed: ' + response.error);
         }
       },
       error: (error) => {
@@ -134,5 +168,25 @@ export class MarketplaceComponent implements OnInit {
         this.notificationService.showError('Payment failed. Please try again.');
       }
     });
+  }
+
+  private processPayUPayment(paymentData: any): void {
+    // Create and submit PayU form
+    const form = document.createElement('form');
+    form.method = 'post';
+    form.action = paymentData.paymentUrl;
+
+    // Add all necessary PayU fields
+    Object.entries(paymentData.formData).forEach(([key, value]) => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = key;
+      input.value = value as string;
+      form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
   }
 }

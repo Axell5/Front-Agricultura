@@ -22,4 +22,8 @@ export class PaymentService {
   createPayment(payment: PaymentRequest): Observable<any> {
     return this.http.post(this.apiUrl, payment);
   }
+
+  processPayment(paymentId: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${paymentId}/process`, {});
+  }
 }
