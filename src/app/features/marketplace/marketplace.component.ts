@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ButtonComponent } from '../../shared/components/button/button.component';
 import { NotificationService } from '../../core/services/notification.service';
 import { PaymentService, PaymentRequest } from '../../core/services/payment.service';
+import { AuthService } from '../../core/services/auth.service';
 
 interface Product {
   id: number;
